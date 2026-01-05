@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tranqulity/core/ui/app_images.dart';
 
-class ChatView extends StatelessWidget {
-  const ChatView({super.key});
+class ShowChatView extends StatelessWidget {
+  const ShowChatView({super.key});
 
   @override
   Widget build(BuildContext context) {

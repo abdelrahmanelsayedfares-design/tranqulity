@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tranqulity/core/logic/helper_methods.dart';
 import 'package:tranqulity/core/ui/app_images.dart';
 import 'package:tranqulity/core/ui/drawer.dart';
-import 'package:tranqulity/views/home/chat.dart';
+import 'package:tranqulity/views/home/show_chat.dart';
 import 'package:tranqulity/views/home/profile.dart';
 import 'package:tranqulity/views/home/quotes.dart';
+import 'assistent.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -15,7 +17,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final list = [
-    _Model(title: 'Chats', text: 'Chats', image: 'chats.svg', page: ChatView()),
+    _Model(title: 'Chats', text: 'Chats', image: 'chats.svg', page: ShowChatView()),
     _Model(
       title: 'Quotes',
       text: 'Quotes',
@@ -30,11 +32,11 @@ class _HomeViewState extends State<HomeView> {
     ),
   ];
   int current = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         title: Text(
           list[current].title,
           style: TextStyle(
@@ -44,9 +46,11 @@ class _HomeViewState extends State<HomeView> {
           ),
         ),
       ),
-      drawer:DrawerView(),
+      drawer: DrawerView(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          goTo(AssistentView(), canPop: true);
+        },
         backgroundColor: Color(0xff284243),
         child: AppImage(image: 'floating.svg', width: 24.w, height: 24.h),
       ),

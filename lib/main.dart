@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tranqulity/views/auth/change_pass.dart';
-import 'package:tranqulity/views/auth/forget_pass.dart';
-import 'package:tranqulity/views/auth/otp.dart';
-import 'package:tranqulity/views/auth/register.dart' show RegisterView;
-import 'package:tranqulity/views/auth/login.dart';
+import 'package:tranqulity/views/auth/register.dart';
 import 'package:tranqulity/views/home/view.dart';
-import 'package:tranqulity/views/on_boarding.dart';
 import 'package:tranqulity/views/splach.dart';
-
 import 'core/logic/helper_methods.dart';
 
 void main() {
@@ -24,7 +18,6 @@ class MyApp extends StatelessWidget {
       designSize: Size(430, 932),
       splitScreenMode: true,
       minTextAdapt: true,
-
       builder: (context, child) {
         return MaterialApp(
           navigatorKey: navigatorKey,
@@ -44,10 +37,7 @@ class MyApp extends StatelessWidget {
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
                 foregroundColor: Colors.black,
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                ),
+                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
               ),
             ),
             inputDecorationTheme: InputDecorationTheme(
@@ -61,7 +51,7 @@ class MyApp extends StatelessWidget {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(
-                  color: Color(0xff2842434A).withValues(alpha: .29),
+                  color: Color(0xff2842434a).withValues(alpha: .29),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -72,7 +62,7 @@ class MyApp extends StatelessWidget {
               ),
             ),
             textTheme: TextTheme(
-              bodySmall:TextStyle(
+              bodySmall: TextStyle(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.w400,
                 color: Colors.black,
@@ -87,8 +77,15 @@ class MyApp extends StatelessWidget {
                 color: Color(0xff284243),
                 fontFamily: 'Mystery Quest',
               ),
+              titleMedium: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-
+            appBarTheme: AppBarTheme(
+              backgroundColor: Color(0xffFFFFFF),
+              scrolledUnderElevation: 0,
+            ),
             scaffoldBackgroundColor: Color(0xffFFFFFF),
             fontFamily: 'Inter',
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

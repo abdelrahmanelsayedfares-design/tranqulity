@@ -88,7 +88,7 @@ class LoginView extends StatelessWidget {
                   SizedBox(width: 8.w),
                   TextButton(
                     onPressed: () {
-                      goTo(RegisterView(),canPop: false);
+                      goTo(RegisterView(),canPop: true);
                     },
                     child: Text(
                       'Sign up',

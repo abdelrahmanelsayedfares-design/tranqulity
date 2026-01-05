@@ -5,21 +5,27 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 void goTo(Widget page, {bool canPop = true, int? delayInSeconds}) {
   void action() {
-    Navigator.pushAndRemoveUntil(
-      navigatorKey.currentContext!,
-      MaterialPageRoute(builder: (context) => page),
-          (route) => canPop,
-    );
+    if (canPop) {
+      Navigator.push(
+        navigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => page),
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        navigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => page),
+            (route) => false,
+      );
+    }
   }
 
   if (delayInSeconds != null) {
-    Timer(Duration(seconds: delayInSeconds), () {
-      action();
-    });
+    Timer(Duration(seconds: delayInSeconds), action);
   } else {
     action();
   }
 }
+
 
 void showMasg(String msg){
   if(msg.isNotEmpty ){
