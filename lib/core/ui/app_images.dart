@@ -73,7 +73,7 @@ class _AppImageState extends State<AppImage>
         },
       );
     } else if (widget.image.toLowerCase().endsWith('.json')) {
-      child= Lottie.asset(
+      child = Lottie.asset(
         'assets/looties/${widget.image}',
         width: widget.width,
         height: widget.height,
@@ -81,7 +81,7 @@ class _AppImageState extends State<AppImage>
         controller: _controller,
       );
       if (widget.onLottieClicked != null) {
-        child= GestureDetector(
+        child = GestureDetector(
           onTap: () {
             if (_controller!.isCompleted) {
               _controller!.reverse();
@@ -89,14 +89,10 @@ class _AppImageState extends State<AppImage>
               _controller!.forward();
             }
             widget.onLottieClicked?.call();
-
           },
-          child:child,
+          child: child,
         );
-
-
       }
-
     } else {
       child = Image.asset(
         'assets/images/${widget.image}',
