@@ -50,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
       goTo(HomeView(), canPop: false);
     } else {
       print(resp.message);
-      showMsg(resp.message ?? 'Login failed!');
+      showMsg(resp.message ?? 'Login failed!',isError: true);
     }
 
     setState(() => isLoading = false);

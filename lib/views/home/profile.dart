@@ -8,6 +8,7 @@ import '../../core/ui/app_buttom.dart';
 import '../../core/ui/app_input.dart';
 import '../../core/ui/image_picker.dart';
 import '../../core/ui/type_male.dart';
+import '../auth/change_password.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -66,6 +67,7 @@ class _ProfileViewState extends State<ProfileView> {
       setState(() => isLoading = false);
     }
   }
+
   Future<void> updateProfile() async {
     if (!formKey.currentState!.validate()) return;
 
@@ -82,10 +84,7 @@ class _ProfileViewState extends State<ProfileView> {
         ),
     });
 
-    final resp = await DioHelper.putData(
-      'api/Profile',
-      data: formData,
-    );
+    final resp = await DioHelper.putData('api/Profile', data: formData);
 
     setState(() => isSaving = false);
 
@@ -94,65 +93,75 @@ class _ProfileViewState extends State<ProfileView> {
       await getProfile();
     } else {
       print(resp.data);
-      showMsg("Update failed");
+      showMsg("Update failed",isError: true);
     }
-  }  @override
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Form(
-            key: formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 20.h),
-                ProfileImagePicker(
-                  icon: 'edit.svg',
-                  imageUrl: imageUrl,
-                  onChanged: (file) {
-                    setState(() {
-                      selectedImage = file;
-                    });
-                  },
-                ),
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      SizedBox(height: 20.h),
+                      ProfileImagePicker(
+                        icon: 'edit.svg',
+                        imageUrl: imageUrl,
+                        onChanged: (file) {
+                          setState(() {
+                            selectedImage = file;
+                          });
+                        },
+                      ),
 
-                SizedBox(height: 30.h),
-                AppInput(
-                  controller: emailController,
-                  hint: 'Email',
-                  textInputType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value!.isEmpty) return "Enter Your Email";
-                    return null;
-                  },
-                ),
+                      SizedBox(height: 30.h),
+                      AppInput(
+                        controller: emailController,
+                        hint: 'Email',
+                        textInputType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value!.isEmpty) return "Enter Your Email";
+                          return null;
+                        },
+                      ),
 
-                AppInput(
-                  controller: ageController,
-                  hint: 'Age',
-                  textInputType: TextInputType.number,
-                  withType: true,
-                  dropdownController: genderController,
-                  validator: (value) {
-                    if (value!.isEmpty) return "Enter age";
-                    return null;
-                  },
-                ),
+                      AppInput(
+                        controller: ageController,
+                        hint: 'Age',
+                        textInputType: TextInputType.number,
+                        withType: true,
+                        dropdownController: genderController,
+                        validator: (value) {
+                          if (value!.isEmpty) return "Enter age";
+                          return null;
+                        },
+                      ),
 
-                SizedBox(height: 30.h),
+                      SizedBox(height: 30.h),
 
-                AppButtom(
-                  text: isSaving ? "Saving..." : "Save",
-                  onPressed: isSaving ? null : updateProfile,
+                      AppButtom(
+                        text: isSaving ? "Saving..." : "Save",
+                        onPressed: isSaving ? null : updateProfile,
+                      ),
+                      SizedBox(height: 20.h),
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: TextButton(
+                          onPressed: () => goTo(ChangePasswordView(), canPop: true),
+                          child: Text('Change Password'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }
