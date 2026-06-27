@@ -21,8 +21,8 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final formerly = GlobalKey<FormState>();
-  final emailController = TextEditingController(text: 'abdotalkhan894@gmail.com');
-  final passwordController = TextEditingController(text: 'abdelrahman@');
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
   bool isLoginClicked = false;
   bool isLoading = false;
   DataState?state;
