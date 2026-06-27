@@ -27,18 +27,20 @@ void goTo(Widget page, {bool canPop = true, int? delayInSeconds}) {
 }
 
 
-void showMasg(String msg){
-  if(msg.isNotEmpty ){
-    ScaffoldMessenger.of(navigatorKey.currentContext!,).
-    showSnackBar(
-        SnackBar(
-          content:
-          Text(msg),
-          duration:  Duration(seconds: 2),
-          // Text('الرجاء تفعيل خدمه الوصول الي الموقع')
-        ));
+void showMsg(
+    String msg, {
+      bool isError = false,
+    }) {
+  final context = navigatorKey.currentContext;
 
-  }
+  if (context == null || msg.isEmpty) return;
 
-
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(msg),
+      duration: const Duration(seconds: 2),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      behavior: SnackBarBehavior.floating,
+    ),
+  );
 }

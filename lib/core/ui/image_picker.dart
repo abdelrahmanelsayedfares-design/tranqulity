@@ -6,24 +6,44 @@ import 'package:tranqulity/core/ui/app_images.dart';
 
 class ProfileImagePicker extends StatefulWidget {
   final String icon;
+  final String? imageUrl;
+  final Function(File?) onChanged;
 
-  const ProfileImagePicker({super.key, required this.icon});
+  const ProfileImagePicker({
+    super.key,
+    required this.icon,
+    required this.onChanged,
+    this.imageUrl,
+  });
 
   @override
   State<ProfileImagePicker> createState() => _ProfileImagePickerState();
 }
 
 class _ProfileImagePickerState extends State<ProfileImagePicker> {
-  final ImagePicker imagePicker = ImagePicker();
+  final ImagePicker picker = ImagePicker();
   File? selectedImage;
 
-  Future<void> imageSelector(ImageSource source) async {
-    XFile? image = await imagePicker.pickImage(source: source);
-    if (image != null && mounted) {
+  Future<void> pickImage(ImageSource source) async {
+    final image = await picker.pickImage(source: source);
+
+    if (image != null) {
+      final file = File(image.path);
+
       setState(() {
-        selectedImage = File(image!.path);
+        selectedImage = file;
       });
+
+      widget.onChanged(file);
     }
+  }
+
+  void removeImage() {
+    setState(() {
+      selectedImage = null;
+    });
+
+    widget.onChanged(null);
   }
 
   @override
@@ -31,76 +51,76 @@ class _ProfileImagePickerState extends State<ProfileImagePicker> {
     return Column(
       children: [
         SizedBox(height: 60.h),
+
         Center(
           child: Stack(
-            alignment: AlignmentDirectional.bottomEnd,
+            alignment: Alignment.bottomRight,
             children: [
               CircleAvatar(
                 radius: 70,
-                backgroundColor: Colors.grey[400],
-                child: selectedImage == null
-                    ? AppImage(
-                        image: 'not_image.png',
-                        width: 54.5.w,
-                        height: 54.5.h,
-                      )
-                    : ClipOval(
-                        child: Image.file(
-                          selectedImage!,
-                          height: 170.h,
-                          width: 170.w,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                backgroundColor: Colors.grey[300],
+                child: selectedImage != null
+                    ? ClipOval(
+                  child: Image.file(
+                    selectedImage!,
+                    width: 140,
+                    height: 140,
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : (widget.imageUrl != null && widget.imageUrl!.isNotEmpty)
+                    ? ClipOval(
+                  child: Image.network(
+                    widget.imageUrl!,
+                    width: 140,
+                    height: 140,
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : AppImage(
+                  image: 'not_image.png',
+                  width: 50.w,
+                  height: 50.h,
+                ),
               ),
+
               CircleAvatar(
-                radius: 25,
-                backgroundColor: Color(0xff284243),
+                radius: 22,
+                backgroundColor: const Color(0xff284243),
                 child: IconButton(
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
-                      builder: (context) => SizedBox(
-                        height: 150.h,
+                      builder: (_) => SizedBox(
+                        height: 160.h,
                         child: Column(
                           children: [
-                            Text(
-                              'Profile',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              "Profile Image",
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Divider(),
+                            const Divider(),
+
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                _Profile(
-                                  icon: Icon(Icons.camera_alt),
-                                  text: 'Camera',
-                                  onPressed: () {
-                                    imageSelector(ImageSource.camera);
-                                  },
+                                _Action(
+                                  icon: Icons.camera_alt,
+                                  text: "Camera",
+                                  onTap: () => pickImage(ImageSource.camera),
                                 ),
-                                _Profile(
-                                  icon: Icon(Icons.image),
-                                  text: 'Gallery',
-                                  onPressed: () {
-                                    imageSelector(ImageSource.gallery);
-                                  },
+                                _Action(
+                                  icon: Icons.image,
+                                  text: "Gallery",
+                                  onTap: () => pickImage(ImageSource.gallery),
                                 ),
                                 if (selectedImage != null)
-                                  _Profile(
-                                    icon: Icon(Icons.delete),
-                                    text: 'Dalet',
-                                    isColor: true,
-                                    onPressed: () {
-                                      if (mounted) {
-                                        setState(() {
-                                          selectedImage = null;
-                                        });
-                                      }
-                                    },
+                                  _Action(
+                                    icon: Icons.delete,
+                                    text: "Remove",
+                                    isRed: true,
+                                    onTap: removeImage,
                                   ),
                               ],
                             ),
@@ -111,8 +131,8 @@ class _ProfileImagePickerState extends State<ProfileImagePicker> {
                   },
                   icon: AppImage(
                     image: widget.icon,
-                    height: 25.6.h,
-                    width: 25.6.w,
+                    width: 24.w,
+                    height: 24.h,
                   ),
                 ),
               ),
@@ -124,18 +144,17 @@ class _ProfileImagePickerState extends State<ProfileImagePicker> {
   }
 }
 
-class _Profile extends StatelessWidget {
+class _Action extends StatelessWidget {
+  final IconData icon;
   final String text;
-  final Icon icon;
-  final void Function() onPressed;
-  final bool isColor;
+  final VoidCallback onTap;
+  final bool isRed;
 
-  const _Profile({
-    super.key,
-    required this.text,
+  const _Action({
     required this.icon,
-    required this.onPressed,
-    this.isColor = false,
+    required this.text,
+    required this.onTap,
+    this.isRed = false,
   });
 
   @override
@@ -143,9 +162,9 @@ class _Profile extends StatelessWidget {
     return Column(
       children: [
         IconButton(
-          onPressed: onPressed,
-          icon: icon,
-          color: isColor ? Colors.red : null,
+          onPressed: onTap,
+          icon: Icon(icon),
+          color: isRed ? Colors.red : Colors.black,
         ),
         Text(text),
       ],

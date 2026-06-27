@@ -8,6 +8,11 @@ class AppInput extends StatefulWidget {
   final bool isbass;
   final bool withType;
   final bool message;
+  final TextInputType textInputType;
+  final String? Function(String?)? validator;
+  final TextEditingController? controller;
+  final DropdownController? dropdownController;
+  final VoidCallback? onSend;
 
   const AppInput({
     super.key,
@@ -15,6 +20,11 @@ class AppInput extends StatefulWidget {
     this.isbass = false,
     this.withType = false,
     this.message = false,
+    this.validator,
+    this.controller,
+    required this.textInputType,
+    this.dropdownController,
+    this.onSend,
   });
 
   @override
@@ -32,40 +42,62 @@ class _AppInputState extends State<AppInput> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: TextFormField(
-              obscureText: widget.isbass ? _obscureText : false,
-              decoration: InputDecoration(
-                hintText: widget.hint,
-                suffixIcon: widget.isbass
-                    ? IconButton(
-                        onPressed: () {
-                          _obscureText = !_obscureText;
-                          setState(() {});
-                        },
-                        icon: _obscureText
-                            ? Icon(Icons.visibility_off)
-                            : Icon(Icons.visibility),
-                        color: Colors.black,
-                      )
-                    : null,
+            child: SizedBox(
+              height: 60.h,
+              child: TextFormField(
+                controller: widget.controller,
+                validator: widget.validator,
+                keyboardType: widget.textInputType,
+                obscureText: widget.isbass ? _obscureText : false,
+                decoration: InputDecoration(
+                  hintText: widget.hint,
+
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 18.h,
+                  ),
+
+                  suffixIcon: widget.isbass
+                      ? IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                          icon: _obscureText
+                              ? Icon(Icons.visibility_off)
+                              : Icon(Icons.visibility),
+                        )
+                      : null,
+                ),
               ),
             ),
           ),
-          SizedBox(width: 12.w),
-          if (widget.withType) Expanded(child: TypeMale()),
-          if (widget.message)
+
+          if (widget.withType) ...[
+            SizedBox(width: 12.w),
+            Expanded(
+              child: TypeMale(
+                controller: widget.dropdownController ?? DropdownController(),
+              ),
+            ),
+          ],
+
+          if (widget.message) ...[
+            SizedBox(width: 12.w),
             InkWell(
-              onTap: () {},
+              onTap:widget.onSend,
               child: Container(
                 width: 60.w,
                 height: 60.h,
                 decoration: BoxDecoration(
-                  color: Color(0xff284243),
+                  color: const Color(0xff284243),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: AppImage(image: 'send_message.svg'),
               ),
             ),
+          ],
         ],
       ),
     );

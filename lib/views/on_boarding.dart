@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tranqulity/core/logic/helper_methods.dart';
 import 'package:tranqulity/core/ui/app_images.dart';
 
+import '../core/logic/cash_helper.dart';
 import 'auth/login.dart';
 
 class OnBoardingView extends StatefulWidget {
@@ -34,9 +35,13 @@ class _OnBoardingViewState extends State<OnBoardingView> {
   ];
   int currentIndex = 0;
 
-  void goToLogin(){
-    goTo(LoginView(),canPop: false);
+  void goToLogin() async {
+    await CacheHelper.setNotFirstTime();
 
+    goTo(
+      LoginView(),
+      canPop: false,
+    );
   }
 
   @override

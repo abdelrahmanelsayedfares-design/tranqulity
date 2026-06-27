@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tranqulity/core/logic/cash_helper.dart';
 import 'package:tranqulity/core/logic/helper_methods.dart';
 import 'package:tranqulity/views/home/view.dart';
 import 'package:tranqulity/views/on_boarding.dart';
 
 import '../core/ui/app_images.dart';
+import 'auth/login.dart';
 
 class SplachView extends StatefulWidget {
   const SplachView({super.key});
@@ -17,7 +19,15 @@ class _SplachViewState extends State<SplachView> {
   @override
   void initState() {
     super.initState();
-    goTo(delayInSeconds: 3,OnBoardingView(),canPop: false);
+    goTo(
+      CacheHelper.isFirstTime
+          ? OnBoardingView()
+          : CacheHelper.isAuth
+          ? HomeView()
+          : LoginView(),
+      canPop: false,
+      delayInSeconds: 3,
+    );
   }
 
   Widget build(BuildContext context) {

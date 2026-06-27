@@ -1,185 +1,223 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tranqulity/core/logic/dio_helper.dart';
 import 'package:tranqulity/core/ui/app_images.dart';
 import 'package:tranqulity/core/ui/app_input.dart';
 
-import '../../core/ui/app_buttom.dart';
+class NewChatView extends StatefulWidget {
+  final int chatId;
+  final String title;
 
-class NewChatView extends StatelessWidget {
-  const NewChatView({super.key});
+  const NewChatView({
+    super.key,
+    required this.chatId,
+    required this.title,
+  });
 
+  @override
+  State<NewChatView> createState() => _NewChatViewState();
+}
+
+class _NewChatViewState extends State<NewChatView> {
+  final messageController = TextEditingController();
+  final scrollController = ScrollController();
+
+  List messages = [];
+
+  bool isLoading = true;
+  bool isSending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getMessages();
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  // ================= GET MESSAGES =================
+  Future<void> getMessages() async {
+    setState(() => isLoading = true);
+
+    final resp = await DioHelper.getData(
+      'api/Chat/${widget.chatId}/messages',
+    );
+
+    if (resp.isSuccess) {
+      messages = resp.data ?? [];
+    }
+
+    setState(() => isLoading = false);
+
+    scrollToBottom();
+  }
+
+  // ================= SCROLL =================
+  void scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  // ================= SEND MESSAGE =================
+  Future<void> sendMessage() async {
+    if (messageController.text.trim().isEmpty) return;
+
+    setState(() => isSending = true);
+
+    final text = messageController.text;
+    messageController.clear();
+
+    final resp = await DioHelper.sendData(
+      'api/Chat/${widget.chatId}/messages',
+      data: {
+        "Text": text,
+      },
+    );
+
+    if (resp.isSuccess) {
+      await getMessages();
+    }
+
+    setState(() => isSending = false);
+  }
+
+  // ================= MESSAGE UI =================
+  Widget buildMessageItem(Map item) {
+    final bool isUser = item['isUserMessage'] == true;
+    final String text = item['text'] ?? '';
+
+    return Align(
+      alignment:
+      isUser
+          ? AlignmentDirectional.centerEnd
+          : AlignmentDirectional.centerStart,
+      child: isUser
+          ? Container(
+        margin: EdgeInsets.only(bottom: 14.h),
+        padding: EdgeInsets.all(12.r),
+        constraints: BoxConstraints(maxWidth: 260.w),
+        decoration: BoxDecoration(
+          color: const Color(0xff284243),
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.sp,
+          ),
+        ),
+      )
+          : Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppImage(
+            image: 'robot.png',
+            isCircle: true,
+            width: 36.w,
+            height: 36.h,
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Container(
+              margin: EdgeInsets.only(bottom: 14.h),
+              padding: EdgeInsets.all(12.r),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 16.sp),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            'About Work',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500),
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
-          PopupMenuButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+        centerTitle: true,
+      ),
+
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+        children: [
+          Expanded(
+            child: messages.isEmpty
+                ? Center(
+              child: Text(
+                "No messages yet",
+                style: TextStyle(fontSize: 16.sp),
+              ),
+            )
+                : ListView.builder(
+              controller: scrollController,
+              padding: EdgeInsets.all(14.r),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                return buildMessageItem(messages[index]);
+              },
             ),
-            color: Colors.white,
-            icon: AppImage(image: 'menu.svg'),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: Text(
-                              'Edit Title',
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                              ),
-                            ),
-                            trailing: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.close, color: Colors.red),
-                            ),
-                          ),
-                          SizedBox(height: 35.h),
-                          AppInput(),
-                          SizedBox(height: 21.h),
-                          AppButtom(text: 'save', onPressed: () {}),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                value: 1,
-                child: Row(
-                  children: [
-                    AppImage(image: 'edit_title.svg'),
-                    SizedBox(width: 16.w),
-                    Text('Profile'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                onTap: () {},
-                value: 2,
-                child: Row(
-                  children: [
-                    AppImage(image: 'delete.svg'),
-                    SizedBox(width: 16.w),
-                    Text('Delete Chat', style: TextStyle(color: Colors.red)),
-                  ],
-                ),
-              ),
-            ],
-            onSelected: (value) {
-              if (value == 1) {
-                // go to profile
-              } else if (value == 2) {
-                // logout
-              }
-            },
           ),
+
+          if (isSending)
+            Padding(
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: const CircularProgressIndicator(),
+            ),
         ],
       ),
+
+      // ================= INPUT =================
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(14).r,
-        child: AppInput(hint: 'write your message', message: true),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 11,
-          vertical: 250,
-        ).copyWith(bottom: 0).r,
-        child: Column(
-          children: [
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: Container(
-                width: 198.w,
-                height: 42.h,
-                decoration: BoxDecoration(
-                  color: Color(0xff284243),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    'Hello How are you?',
-                    style: TextStyle(color: Colors.white, fontSize: 18.sp),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-            _Model(
-              text:
-                  'Hello! Im just a computer program,so I dont have feelings in the same way humans do, but Im here and ready to assist you. How can I help you today?',
-            ),
-            SizedBox(height: 16.h),
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: Container(
-                width: 198.w,
-                height: 42.h,
-                decoration: BoxDecoration(
-                  color: Color(0xff284243),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    'I feel upset',
-                    style: TextStyle(color: Colors.white, fontSize: 18.sp),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-            _Model(
-              text:
-                  'Im sorry to hear that youre feeling upset. If youd like, you can share whats on your mind, and Im here to listen and offer support or guidance if you need it. Remember, its okay to feel upset sometimes, and its important to take care of yourself.',
-            ),
-          ],
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-      ),
-    );
-  }
-}
-
-class _Model extends StatelessWidget {
-  final String text;
-
-  const _Model({super.key, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        AppImage(image: 'robot.png', isCircle: true, width: 36.w, height: 36.h),
-        SizedBox(width: 7.w),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Color(0xff2842431A).withValues(alpha: .10),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(14.r),
+            child: Row(
+              children: [
+                Expanded(
+                  child: AppInput(
+                    controller: messageController,
+                    hint: 'Write your message',
+                    textInputType: TextInputType.text,
+                    message: true,
+                    onSend: sendMessage,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

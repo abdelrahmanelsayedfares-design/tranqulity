@@ -25,9 +25,9 @@ class ChangePasswordView extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall,
             ),
             SizedBox(height: 24.h),
-            AppInput(hint: 'Old Password',isbass: true,),
-            AppInput(hint: 'New Password',isbass: true,),
-            AppInput(hint: 'Confirm New Password',isbass: true,),
+            AppInput(hint: 'Old Password',isbass: true,textInputType: TextInputType.text,),
+            AppInput(hint: 'New Password',isbass: true,textInputType: TextInputType.text),
+            AppInput(hint: 'Confirm New Password',isbass: true,textInputType: TextInputType.text),
             SizedBox(height: 36.h),
             AppButtom(text: 'Change Password',onPressed: (){},),
 
